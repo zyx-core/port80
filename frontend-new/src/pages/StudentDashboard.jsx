@@ -10,7 +10,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/students/profile", {
+        const res = await axios.post("http://localhost:5000/api/students/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStudent(res.data.student);

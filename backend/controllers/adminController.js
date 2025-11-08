@@ -136,11 +136,49 @@ export const getSingleStudent = async (req, res) => {
 
 
 //getreport
+
+
 export const getReport = async (req, res) => {
   try {
-    const students = await Student.find().select("name branch year progress");
-    res.json({ students });
+    const students = await Student.find().select("name email branch year progress");
+    res.status(200).json({ students });
   } catch (err) {
-    res.status(500).json({ message: "Error generating report" });
+    res.status(500).json({ message: "Error generating report", error: err.message });
+  }
+};
+
+
+
+// ✅ Admin Generate Full Report
+export const generateReport = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+
+    const query = {};
+    if (startDate && endDate) {
+      query["progress.history.date"] = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const students = await Student.find(query).select("-password");
+
+    const stats = {
+      totalStudents: students.length,
+      avgMuLearn: Math.round(students.reduce((a, s) => a + (s.progress?.mulearn || 0), 0) / students.length),
+      avgLeetCode: Math.round(students.reduce((a, s) => a + (s.progress?.leetcode || 0), 0) / students.length),
+      avgGitHub: Math.round(students.reduce((a, s) => a + (s.progress?.github || 0), 0) / students.length),
+    };
+
+    // Leaderboard (Top 5 by LeetCode solves)
+    const leaderboard = [...students]
+      .sort((a, b) => (b.progress?.leetcode || 0) - (a.progress?.leetcode || 0))
+      .slice(0, 5);
+
+    res.json({ stats, students, leaderboard });
+
+  } catch (err) {
+    res.status(500).json({ message: "Report generation failed", error: err.message });
   }
 };

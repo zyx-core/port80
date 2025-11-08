@@ -6,23 +6,30 @@ import {
   getAllStudents,
   deleteStudent,
   updateStudent,
+  getDashboardStats,
+  getSingleStudent,
+  generateReport   // ✅ Make sure this is imported
 } from "../controllers/adminController.js";
 
 import { protectAdmin } from "../middleware/authMiddleware.js";
-import { getDashboardStats } from "../controllers/adminController.js";
-import { getSingleStudent } from "../controllers/adminController.js";
-
 
 const router = express.Router();
 
-// ✅ Auth Routes
+// Auth
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 
+// ✅ FIXED REPORT ROUTE
+router.post("/report", protectAdmin, generateReport);
+
+
+// Dashboard
 router.get("/dashboard", protectAdmin, getDashboardStats);
-// ✅ Admin-Protected Student Management Routes
+
+// Student management
 router.get("/students", protectAdmin, getAllStudents);
-router.delete("/student/:id", protectAdmin, deleteStudent);
-router.put("/student/:id", protectAdmin, updateStudent);
 router.get("/students/:id", protectAdmin, getSingleStudent);
+router.put("/student/:id", protectAdmin, updateStudent);
+router.delete("/student/:id", protectAdmin, deleteStudent);
+
 export default router;
