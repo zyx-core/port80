@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node local-runner.js",
-    "client": "vite",
-    "build": "vite build",
+    "client": "npx vite",
+    "build": "npx vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "vercel-dev": "vercel dev"
